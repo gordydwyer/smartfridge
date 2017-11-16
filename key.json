@@ -1,0 +1,12 @@
+{"type": "service_account",
+  "project_id": "eecs-473-smart-fridge",
+  "private_key_id": "60d747f9a7673a1eb6df0fdd530500b4eb474af0",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCXEABGBZBEzbG2\nnYmwWcJEwHWFaobQHTrYHyBEIKd+N12NbIWIrg/2vYsJNhpx7YKGcJwEuX12ZEwb\nGlEQB96J69IhyjNAm82HiLJaHUBOAjDQFPkSr/fDRTmNpcRgomnCddLU0zy5s+e+\n1cg1OxSJW0XrnulNMma75wwMkYbl1Z0g1pku9QuAkU8MkOqOzJRnWMe+dWIAqsZP\ngAPhYlrmp9cL25wGIEMB1sxFL0xYJdIQVSJjDI/JHYe4IRF7eACzdDYtsguEkkWJ\nNQ6JBwCm23EbxLipp3/CemNQcmfngBFgioL4Cmeo766wyOL200g0Soer9Zsouq3Z\n+cwuF8u1AgMBAAECggEAG3ja++D+JC0eQR40UKB6PoObu8gsPUPblDtQ5GLl4wPR\nnSsbu8gf+hjtZJ70vzxY7PckwI01PmcuGg22qUotE/sRi3iYyoqrHZdkDBRewfEP\nDICL7XSYA+ied16qsIJI5ocD8RV7aTBJGIELeHbGnNY/CIMtXY8pdMmnfM+obzqa\n2oKJevSKGU3/S5pnHcQ8TM+u7q2lNMS1lZgeohZEo02PMLSYuGX51NfA/vLglqfU\nkhB8HuUcmP6qDDX6mgXwCFTUiFBt1EY5DZV9lA9RyjD9ngw575lTMZN0ymWQWXvB\nbBD22JuKGAc87BrGBmftmeF1RETdhTw61vdDDpA40QKBgQDKfa1bzlyzZRxgunvS\nYEbmOnZvPCS3c2psBDFaieX4TEyXG63Fnnb4UUZ9eE/dS+nEzilY03LfokoSPgpK\nZ4OfTPRJN9NGMzil4ckfXCKe8OJ0TUg83CNj7qviDnFj76wvU3EyGbqN/k7sP3vf\nZ5zYqHYguyn6nxzZ0I5mzqw6uQKBgQC++z0sNHGzr+4EkilP+yhnzDTil1SyMIGG\nGDFvI64djnalijjIY80zN4FJXJfKADU87xEYb2ij9b2J14XiBgkFUu9iWhqQ2bWy\nsFAlvgID9u4yxbRiNA1dhg82wqVmv/19gsOznhduR5zGtad7R9wVUO6zQxnWYkAf\no7EYdZzq3QKBgQDAL8xsSE7fzeXDQPvozow8U9y48sJ+g8LMRqZ5Ikzs/63p9dFW\nsXKFeM6Io7pZdYWoz2ua7QYoj6Xx7oRh3iGk/qsVGzEhfdgUSVpUs2QAquykKf2Y\nFfBZFtx4r/CbQ42PVYkoXhccUfSichamEXdig3Gq2zmar434hePCXAJHsQKBgCHE\nwrhCPaiL/wYH4g4mVqqjzOYT5AHt2bkgJf2EzZCkVA5JNmkYXHwl4FJccOpixwcT\nLm6npFT5ap4o4Z9pecbbN0CotfHOzPXffwxtYGXbD5siohaLJaHXxnDkUeKtJ+E9\nceUcmwAA4ZOxIwAFYMDUIqDHyJXDoZr2kqXEhg5xAoGAKFO0if89WGqY9crbtPzH\nLqpjB+ZSGS9V4Rp9G9Nymgw7fmuWLtFtIbA5UShCWfvk0qRfAafGHWCox1+XytoT\nO17SUW7QqHGwWBMeFPIIpZhnBq6+Ssp857xOh9Xfh4K8vhY1SUR3MfKL0XOBOCHD\n7Lg6BMytJiduuyZtp156QQE=\n-----END PRIVATE KEY-----\n",
+  "client_email": "gdwyer@eecs-473-smart-fridge.iam.gserviceaccount.com",
+  "client_id": "108125326817965525734",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://accounts.google.com/o/oauth2/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/gdwyer%40eecs-473-smart-fridge.iam.gserviceaccount.com"
+}
+

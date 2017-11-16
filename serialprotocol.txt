@@ -1,0 +1,10 @@
+Serial protocal for communicating from our PCB to rPi and vice versa.
+
+To rPi from cPCB:
+first byte = type of information to follow
+	1. weight of an item on the LS
+		0x1 -> 0x(analog value read by scale	
+	3. temp and humidity
+		0x2 -> 0x(analog value for temp and humidity)
+
+
