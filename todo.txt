@@ -1,0 +1,9 @@
+motor control on MSP430
+get weights from scale
+get force sensor data
+serial data to Pi
+parse data and write to structs & files
+data to GUI(lcd)
+send data to phone
+enclosures for boards
+
