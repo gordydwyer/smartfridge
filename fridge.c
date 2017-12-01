@@ -1,12 +1,32 @@
 #include "stdio.h"
 #include "struct.h"
 #include "assert.h"
+#include "stdlib.h"
 
 // Index 0 = location 0 etc. index does not correlate to anything in the outFridge array
-item_t inFridge[4];	//array of items currently in the fridge
-item_t outFridge[4];	//array of items that have been removed from the fridge and are awaiting re-entry
+item_t inFridge[4] = [empty_item, empty_item, empty_item, empty_item];	//array of items currently in the fridge
+item_t outFridge[4] = [empty_item, empty_item, empty_item, empty_item];	//array of items that have been removed from the fridge and are awaiting re-entry
+item_t empty_item = {"EMPTY", "0", 0, 0, 0, -1};
 
 int new_items[4] = [0,0,0,0];
+
+// Function for comparing C strings
+int checker(char * input1,char * input2)
+{
+    	int i;
+	int result = 1;
+
+    	for(i = 0; input1[i]!='\0' && input2[i]!='\0'; ++i)
+	{
+        	if(input1[i] != input2[i])
+		{
+            		result = 0;
+            		break;
+        	}
+    	}
+
+   	return result;
+}
 
 // searches outFridge array for an item, if it is found, returns the index of the item in outfridge
 int search_outFridge(item_t item)
@@ -15,24 +35,18 @@ int search_outFridge(item_t item)
 	{
 		if(item.name == outFridge[i].name) return i;		
 	}
-	
 	return -1; // not found
-}
-
-void take_picture()
-{
-	system("raspistill -o test.jpeg");
-	system("python parsepic.py");
-	return;
 }
 
 // takes a picture using picam, and from the output of the python code, populates the name and confidence
 // variables of the proper location 
 void vision(int loc)
 {
-	take_picture();
+	FILE * file;	
 
-	FILE * file;
+	system("raspistill -o test.jpeg");
+	system("python parsepic.py");
+
 	file = fopen("returncsv.csv", "r");
 	if (file)
 	{
@@ -52,6 +66,119 @@ void vision(int loc)
 	return;
 }
 
+void inventory(FILE * fp)
+{
+	int i;	
+	int index;
+	char * empty_str = "empty";
+
+	FILE * list;
+	FILE * inv;
+	inv = fopen("items.txt", "w");
+	list = fopen("list.txt", "w");	
+
+	// Move the LS to home position
+	fprintf(fp, "H\n");
+
+	for(i = 0; i < 4; ++i)
+	{
+		if(new_items[i] == 1)
+		{
+			// Vision populates the name and conf
+			vision(i);
+
+			// Check for previous existence
+			index = search_outFridge(inFridge[i]);
+			// If no similar item is found
+			if(index == -1)	
+			{
+				// Set initial weight to its current weight
+				inFridge[i].initial_weight = inFridge[i].current_weight;
+				set_percent_left(inFridge[i]);
+			}
+			// Item had previously been in the fridge
+			else
+			{
+				inFridge[i].initial_weight = outFridge[index].initial_weight;
+				set_percent_left(inFridge[i]);
+				outFridge[index] = empty_item;
+			}
+		}	
+		// Move to next LS position
+		fprintf(fp, "N\n");
+	}
+
+	// Update the items file for GUI
+	for(i = 0; i < 4; ++i)
+	{
+		if(!checker(inFridge[i], empty_str))
+		{
+			fprintf(inv, "%s %f\n", inFridge[i].name, inFridge[i].percent_left);
+		}
+	}	
+
+	// add items to the list file for GUI & text message	
+	for(i = 0; i < 4; ++i)
+	{
+		// If an item in inFridge is not empty_item and has <= 50 percent left: add to list
+		if((!checker(inFridge[i], empty_str)) && (inFridge[i].percent_left <= 50.0))
+		{
+			fprintf(list, "%s\n", inFridge[i].name);
+		}
+		// If an item is out of the fridge, add to list
+		if(!checker(outFridge[i], empty_str))
+		{
+			fprintf(list, "%s\n", outFridge[i].name);
+		}
+	}
+
+	fclose(inv);
+	fclose(list);
+
+	return;
+}
+
+void parse_packet(char *data)
+{
+	int i;
+	float weight;
+	uint8_t add = data[0];
+	uint8_t loc = data[1];
+	uint32_t int_weight = data[2];
+		
+	// Convert 
+	for(i = 1; i < 4; ++i)
+	{
+		int_weight = (int_weight << (8*i) || data[2+i];
+	}	
+
+	weight = int_weight;
+	printf("Float weight: %f\n", weight);
+	
+	// TODO parse temp and humidity
+
+	// If adding an item
+	if(add)
+	{
+		// Mark location to be visited during inventory()
+		new_items[loc] = 1;
+		// Set current weight of item to value received
+		inFridge[loc].current_weight = weight;
+	}
+	
+	// else removing item
+	else
+	{	
+		// Move item from inFridge to outFridge
+		outFridge[loc] = inFridge[loc];
+		inFridge[loc] = empty_item;
+		new_items[loc] = 0;
+	}
+	
+	return;
+}
+
+// Main program loop
 int main()
 {	
 	char buf[11];
@@ -62,27 +189,14 @@ int main()
 	// main loop
 	while(1)
 	{
-		// Data is found
-		if(fgets(buf, 1, uart) != NULL)
-		{
-			if(buf[0] == 'X') // if its an X, means take inventory
-			{
-				inventory();
-				continue;
-			}
-
-			delay(200);
-			fgets(buf + 1, 10, uart);
-
-				
-
-			// parse out bytes and assign
-		}
-
-		else
-		{
-			delay(1000);
-		}
+		// Wait for data
+		fread(buf, 1, 11, uart);
+		printf("Data Recieved\n%s", buf);
+		
+		// If the first byte is the char X, take inventory
+		if(buf[0] == 'X') inventory(uart);
+		// Else parse the data packet
+		else parse_packet(buf);
 	}	
 	
 	fclose(uart);
