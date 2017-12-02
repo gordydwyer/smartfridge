@@ -7,7 +7,7 @@
 
 // Index 0 = location 0 etc. index does not correlate to anything in the outFridge array
 item_t inFridge[4];	//array of items currently in the fridge
-item_t outFridge[4];	//array of items that have been removed from the fridge and are awaiting re-entry
+item_t outFridge[50];	//array of items that have been removed from the fridge and are awaiting re-entry
 int new_items[4];
 
 // Function for comparing C strings
@@ -31,11 +31,27 @@ int checker(char * input1,char * input2)
 // searches outFridge array for an item, if it is found, returns the index of the item in outfridge
 int search_outFridge(item_t item)
 {
-	for(int i = 0; i < 4; ++i)
+	int i;	
+	int comp;	
+
+	for(i = 0; i < 50; ++i)
 	{
-		if(item.name == outFridge[i].name) return i;		
+		comp = checker(item.name, outFridge[i].name);
+		if(comp) return i;		
 	}
 	return -1; // not found
+}
+
+// finds next empty spot in out of fridge array
+int find_first_empty()
+{
+	int i;
+	for(i = 0; i < 50; ++i);
+	{
+		if(outFridge[i].location == -1) return i;
+	}
+
+	return -1;
 }
 
 // takes a picture using picam, and from the output of the python code, populates the name and confidence
@@ -146,6 +162,7 @@ void inventory(FILE * fp)
 void parse_packet(char *data)
 {
 	int i;
+	int empty_index;
 	float weight;
 	uint8_t add = atoi(&data[0]);
 	uint8_t loc = atoi(&data[1]);
@@ -179,7 +196,8 @@ void parse_packet(char *data)
 	{	
 		printf("Removing Item");
 		// Move item from inFridge to outFridge
-		outFridge[loc] = inFridge[loc];
+		empty_index = find_first_empty();
+		outFridge[empty_index] = inFridge[loc];
 		make_empty(inFridge[loc]);
 		new_items[loc] = 0;
 	}
@@ -210,7 +228,8 @@ int main()
 		printf("Entering Main While Loop");	
 
 		// Wait for data
-		fread(buf, 1, 11, uart);
+		fread(buf, 1, 6, uart);
+		//fread(buf, 1, 11, uart);
 		printf("Data Recieved\n%s", buf);
 		
 		// If the first byte is the char X, take inventory
@@ -222,25 +241,4 @@ int main()
 	fclose(uart);
 	return 0;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 

@@ -43,6 +43,7 @@ void make_empty(item_t item)
 	item.current_weight = -1;
 	item.percent_left = -1;
 	item.location = -1;
+
 	return;
 }
 
@@ -52,8 +53,12 @@ void make_empty_all(item_t *arr1, item_t *arr2)
 
 	for(i = 0; i < 4; ++i)
 	{
-		make_empty(arr1[i]);
-		make_empty(arr2[i]);	
+		make_empty(arr1[i]);	
+	}
+
+	for(i = 0; i < 50; ++i)
+	{
+		make_empty(arr2[i]);
 	}
 
 	return;
