@@ -2,13 +2,13 @@
 #include "struct.h"
 #include "assert.h"
 #include "stdlib.h"
+#include "stdint.h"
+#include "inttypes.h"
 
 // Index 0 = location 0 etc. index does not correlate to anything in the outFridge array
-item_t inFridge[4] = [empty_item, empty_item, empty_item, empty_item];	//array of items currently in the fridge
-item_t outFridge[4] = [empty_item, empty_item, empty_item, empty_item];	//array of items that have been removed from the fridge and are awaiting re-entry
-item_t empty_item = {"EMPTY", "0", 0, 0, 0, -1};
-
-int new_items[4] = [0,0,0,0];
+item_t inFridge[4];	//array of items currently in the fridge
+item_t outFridge[4];	//array of items that have been removed from the fridge and are awaiting re-entry
+int new_items[4];
 
 // Function for comparing C strings
 int checker(char * input1,char * input2)
@@ -44,6 +44,8 @@ void vision(int loc)
 {
 	FILE * file;	
 
+	printf("Entering vision()");
+
 	system("raspistill -o test.jpeg");
 	system("python parsepic.py");
 
@@ -74,6 +76,9 @@ void inventory(FILE * fp)
 
 	FILE * list;
 	FILE * inv;
+
+	printf("Entering inventory()");
+
 	inv = fopen("items.txt", "w");
 	list = fopen("list.txt", "w");	
 
@@ -101,7 +106,7 @@ void inventory(FILE * fp)
 			{
 				inFridge[i].initial_weight = outFridge[index].initial_weight;
 				set_percent_left(inFridge[i]);
-				outFridge[index] = empty_item;
+				make_empty(outFridge[index]);
 			}
 		}	
 		// Move to next LS position
@@ -111,7 +116,7 @@ void inventory(FILE * fp)
 	// Update the items file for GUI
 	for(i = 0; i < 4; ++i)
 	{
-		if(!checker(inFridge[i], empty_str))
+		if(!checker(inFridge[i].name, empty_str))
 		{
 			fprintf(inv, "%s %f\n", inFridge[i].name, inFridge[i].percent_left);
 		}
@@ -121,12 +126,12 @@ void inventory(FILE * fp)
 	for(i = 0; i < 4; ++i)
 	{
 		// If an item in inFridge is not empty_item and has <= 50 percent left: add to list
-		if((!checker(inFridge[i], empty_str)) && (inFridge[i].percent_left <= 50.0))
+		if((!checker(inFridge[i].name, empty_str)) && (inFridge[i].percent_left <= 50.0))
 		{
 			fprintf(list, "%s\n", inFridge[i].name);
 		}
 		// If an item is out of the fridge, add to list
-		if(!checker(outFridge[i], empty_str))
+		if(!checker(outFridge[i].name, empty_str))
 		{
 			fprintf(list, "%s\n", outFridge[i].name);
 		}
@@ -142,14 +147,16 @@ void parse_packet(char *data)
 {
 	int i;
 	float weight;
-	uint8_t add = data[0];
-	uint8_t loc = data[1];
+	uint8_t add = atoi(&data[0]);
+	uint8_t loc = atoi(&data[1]);
 	uint32_t int_weight = data[2];
 		
+	printf("Entering parse_packet()");
+
 	// Convert 
 	for(i = 1; i < 4; ++i)
 	{
-		int_weight = (int_weight << (8*i) || data[2+i];
+		int_weight = (int_weight << (8*i)) || data[2+i];
 	}	
 
 	weight = int_weight;
@@ -160,6 +167,7 @@ void parse_packet(char *data)
 	// If adding an item
 	if(add)
 	{
+		printf("Adding item");
 		// Mark location to be visited during inventory()
 		new_items[loc] = 1;
 		// Set current weight of item to value received
@@ -169,9 +177,10 @@ void parse_packet(char *data)
 	// else removing item
 	else
 	{	
+		printf("Removing Item");
 		// Move item from inFridge to outFridge
 		outFridge[loc] = inFridge[loc];
-		inFridge[loc] = empty_item;
+		make_empty(inFridge[loc]);
 		new_items[loc] = 0;
 	}
 	
@@ -181,14 +190,25 @@ void parse_packet(char *data)
 // Main program loop
 int main()
 {	
+	int i;
 	char buf[11];
 	FILE * uart;
 	uart = fopen("/dev/serial0", "r+");
 	assert(uart);
 
+	// init array to all empty
+	for(i = 0; i < 4; ++i)
+	{
+		new_items[i] = 0;
+	}
+	
+	make_empty_all(inFridge, outFridge);
+
 	// main loop
 	while(1)
 	{
+		printf("Entering Main While Loop");	
+
 		// Wait for data
 		fread(buf, 1, 11, uart);
 		printf("Data Recieved\n%s", buf);

@@ -18,7 +18,48 @@ typedef struct{
 } item_t;
 
 
+void make_empty(item_t item)
+{
+	int i;
 
+	item.name[0] = 'e';
+	item.name[1] = 'm';
+	item.name[2] = 'p';
+	item.name[3] = 't';
+	item.name[4] = 'y';
+	
+	for(i = 5; i < 24; ++i)
+	{
+		item.name[i] = '\0';	
+	}
+
+	item.confidence[0] = '-';
+	item.confidence[1] = '1';
+	item.confidence[2] = '\0';
+	item.confidence[3] = '\0';
+	item.confidence[4] = '\0';
+
+	item.initial_weight = -1;
+	item.current_weight = -1;
+	item.percent_left = -1;
+	item.location = -1;
+	return;
+}
+
+void make_empty_all(item_t *arr1, item_t *arr2)
+{
+	int i;
+
+	for(i = 0; i < 4; ++i)
+	{
+		make_empty(arr1[i]);
+		make_empty(arr2[i]);	
+	}
+
+	return;
+}
+
+/*
 char* get_name(item_t item)
 {
 	return item.name;
@@ -28,6 +69,7 @@ char* get_confidence(item_t item)
 {
 	return item.confidence;
 }
+*/
 
 float get_intital_weight(item_t item)
 {
