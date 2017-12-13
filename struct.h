@@ -6,7 +6,6 @@
 	perent_left = percent of the item left based upon intial and current weight
 	location = which location on the lazy susan that the item is currently located at
 */	
-#include <string.h>
 
 typedef struct{
 	char 	name[24];
